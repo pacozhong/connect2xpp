@@ -6,8 +6,24 @@ class connect2xpp_admin{
 	const ADMIN_PAGE_TITLE = '连接到xplusplus.cn';
 	const ADMIN_PAGE_TAB_NAME = 'connect2xpp';
 	
-	private static $initiated = false;
-	private static $notices = array();
+	public static $initiated = false;
+	public static $notice = '';
+	public static $return_code = 1600;
+	public static $return_msg = '';
+	
+	const NOTICE_NEW_KEY_EMPTY = 'new_key_empty';
+	const NOTICE_NEW_KEY_EQUAL_OLD_KEY = 'new_key_equal_old_key';
+	const NOTICE_HTTP_REQ_ERROR = 'http_req_error';
+	const NOTICE_XPP_CODE_NON	=	'xpp_code_non';//key 不存在
+	const NOTICE_XPP_SWITCH_OFF	=	'xpp_switch_off';//xpp端开关未打开
+	const NOTICE_XPP_MAIL_STATUS_BAD = 'xpp_mail_status_bad';//xpp端邮箱状态不对
+	const NOTICE_XPP_OTHER_ERROR	=	'xpp_other_error';//xpp端其他错误
+	const NOTICE_SET_KEY_SUS	=	'set_key_sus';
+	
+	public static function setReturnCodeAndMsg($code, $msg){
+		self::$return_code = $code;
+		self::$return_msg = $msg;
+	}
 	
 	public static function init(){
 		if(! self::$initiated) {
@@ -16,9 +32,19 @@ class connect2xpp_admin{
 		
 		if(isset($_POST['action'])){
 			if( $_POST['action'] == 'enter_key'){
-				
+				self::save_key();
 			}else if($_POST['action'] == 'sync_all'){
-				
+				self::sync_all();
+			}
+		}
+		if ( isset( $_GET['action'] ) ) {
+			if ( $_GET['action'] == 'delete-key' ) {
+				if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], self::NONCE ) ){
+					delete_option( connect2xpp::$xpp_api_key );
+					delete_option(connect2xpp::$xpp_email);
+					delete_option(connect2xpp::$xpp_home);
+					delete_option(connect2xpp::$xpp_user_name);
+				}
 			}
 		}
 	}
@@ -50,6 +76,37 @@ class connect2xpp_admin{
 		add_action( 'admin_menu', array('connect2xpp_admin', 'plugin_menu'));
 		
 		add_action( 'admin_enqueue_scripts', array( 'connect2xpp_admin', 'load_resources' ) );
+	}
+	
+	public static function sync_all(){
+		
+	}
+	
+	public static function save_key(){
+		if ( function_exists('current_user_can') && !current_user_can('manage_options') )
+			die('cheating!');
+		
+		if ( !wp_verify_nonce( $_POST['_wpnonce'], self::NONCE ) )
+			return false;
+		$new_key = trim($_POST['key']);
+		if(! $new_key){
+			self::$notice = self::NOTICE_NEW_KEY_EMPTY;
+			return false;
+		}
+		$old_key = connect2xpp::get_api_key();
+		if($new_key == $old_key){
+			self::$notice = self::NOTICE_NEW_KEY_EQUAL_OLD_KEY;
+			return false;
+		}
+		$verify_ret_data = connect2xpp::verify_key($new_key);
+		if(false == $verify_ret_data){
+			return false;
+		}
+		connect2xpp::save_api_key($new_key);
+		connect2xpp::setUserNameAndEmailAndHome($verify_ret_data['first_name'] . $verify_ret_data['second_name'], 
+							$verify_ret_data['email'], $verify_ret_data['home']);
+		self::$notice = self::NOTICE_SET_KEY_SUS;
+		return true;
 	}
 	
 	public static function get_page_url( $page = 'form' ) {
@@ -98,7 +155,7 @@ class connect2xpp_admin{
 	}
 	
 	public static function plugin_options() {
-		if(! connect2xpp::get_api_key()){
+		if( connect2xpp::get_api_key()){
 			self::display_stat();
 		}else{
 			self::display_form();
@@ -106,12 +163,14 @@ class connect2xpp_admin{
 	}
 	
 	public static function display_form(){
-		echo '<h2 class="ak-header">xplusplus.cn</h2>';
-		connect2xpp::view('notice');
+		if(self::$notice == '')
+			echo '<h2 class="ak-header">xplusplus.cn</h2>';
+		connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
 		connect2xpp::view('form');
 	}
 	
 	public static function display_stat(){
+		connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
 		connect2xpp::view('stat');
 	}
 	

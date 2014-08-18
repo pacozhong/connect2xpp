@@ -1,12 +1,7 @@
 <div class="wrap">
-
 	<h2>connect to xpp</h2>
-
 	<div class="have-key">
-		<div id="wpcom-stats-meta-box-container" class="metabox-holder"><?php
-			wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce', false );
-			wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce', false );
-			?>
+		<div id="wpcom-stats-meta-box-container" class="metabox-holder">
 			<script type="text/javascript">
 			jQuery(document).ready( function($) {
 				jQuery('.if-js-closed').removeClass('if-js-closed').addClass('closed');
@@ -27,23 +22,30 @@
 											<th width="10%" align="left" scope="row">API KEY</th>
 											<td width="5%"/>
 											<td align="left">
-												<span class="api-key">xxxxxxxxxxxxxx<?php echo esc_attr( connect2xpp::get_api_key() ); ?></span>
+												<span class="api-key"><?php echo connect2xpp::get_api_key() ?></span>
 											</td>
 										</tr>
 										<tr>
-											<th align="left" scope="row">评论</th>
+											<th align="left" scope="row">用户名</th>
 											<td></td>
 											<td align="left">
 												<p>
-													测试文字
+													<?php echo connect2xpp::getUserName();?>
 												</p>
 											</td>
 										</tr>
 										<tr>
-											<th class="strictness" align="left" scope="row">严密度</th>
+											<th class="strictness" align="left" scope="row">邮箱</th>
 											<td></td>
 											<td align="left">
-												<p>测试文字</p>
+												<p><?php echo connect2xpp::getEmail(); ?></p>
+											</td>
+										</tr>
+										<tr>
+											<th class="strictness" align="left" scope="row">地址</th>
+											<td></td>
+											<td align="left">
+												<p><a href="<?php echo connect2xpp::getHome();?>"><?php echo connect2xpp::getHome();?></a></p>
 											</td>
 										</tr>
 									</tbody>
