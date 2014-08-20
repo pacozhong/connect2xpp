@@ -4,7 +4,101 @@
  * code
  * msg
  */
-if($type == connect2xpp_admin::NOTICE_SET_KEY_SUS){
+if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
+<div class="updated" style="padding: 0; margin: 0; border: none; background: none;">
+	<style type="text/css">
+.xplusplus_activate{
+	min-width:825px;
+	border:1px solid #4F800D;
+	padding:5px;
+	margin:15px 0;
+	background:#83AF24;
+	background-image:-webkit-gradient(linear,0% 0,80% 100%,from(#83AF24),to(#4F800D));
+	background-image:-moz-linear-gradient(80% 100% 120deg,#4F800D,#83AF24);
+	-moz-border-radius:3px;border-radius:3px;
+	-webkit-border-radius:3px;
+	position:relative;overflow:hidden
+}
+.xplusplus_activate .aa_a{
+	position:absolute;
+	top:-5px;
+	right:10px;
+	font-size:140px;
+	color:#769F33;
+	font-family:Georgia, "Times New Roman", Times, serif;z-index:1
+}
+.xplusplus_activate .aa_button{
+	font-weight:bold;
+	border:1px solid #029DD6;
+	border-top:1px solid #06B9FD;
+	font-size:15px;
+	text-align:center;
+	padding:9px 0 8px 0;
+	color:#FFF;
+	background:#029DD6;
+	background-image:-webkit-gradient(linear,0% 0,0% 100%,from(#029DD6),to(#0079B1));
+	background-image:-moz-linear-gradient(0% 100% 90deg,#0079B1,#029DD6);
+	-moz-border-radius:2px;
+	border-radius:2px;
+	-webkit-border-radius:2px
+}
+.xplusplus_activate .aa_button:hover{
+	text-decoration:none !important;
+	border:1px solid #029DD6;
+	border-bottom:1px solid #00A8EF;
+	font-size:15px;
+	text-align:center;
+	padding:9px 0 8px 0;
+	color:#F0F8FB;
+	background:#0079B1;
+	background-image:-webkit-gradient(linear,0% 0,0% 100%,from(#0079B1),to(#0092BF));
+	background-image:-moz-linear-gradient(0% 100% 90deg,#0092BF,#0079B1);
+	-moz-border-radius:2px;border-radius:2px;-webkit-border-radius:2px
+}
+.xplusplus_activate .aa_button_border{
+	border:1px solid #006699;
+	-moz-border-radius:2px;
+	border-radius:2px;
+	-webkit-border-radius:2px;
+	background:#029DD6;
+	background-image:-webkit-gradient(linear,0% 0,0% 100%,from(#029DD6),to(#0079B1));
+	background-image:-moz-linear-gradient(0% 100% 90deg,#0079B1,#029DD6)
+}
+.xplusplus_activate .aa_button_container{
+	cursor:pointer;
+	display:inline-block;
+	background:#DEF1B8;
+	padding:5px;
+	-moz-border-radius:2px;
+	border-radius:2px;
+	-webkit-border-radius:2px;width:266px
+}
+.xplusplus_activate .aa_description{
+	position:absolute;
+	top:22px;
+	left:285px;
+	margin-left:25px;
+	color:#E5F2B1;
+	font-size:15px;z-index:1000
+}
+.xplusplus_activate .aa_description strong{
+	color:#FFF;font-weight:normal
+}
+</style>
+	<form name="xplusplus_activate" action="<?php echo esc_url( connect2xpp_admin::get_page_url() ); ?>" method="POST">
+		<div class="xplusplus_activate">
+			<div class="aa_a">X</div>
+			<div class="aa_button_container" onclick="document.xplusplus_activate.submit();">
+				<div class="aa_button_border">
+					<div class="aa_button">设置您的Xplusplus.cn账号</div>
+				</div>
+			</div>
+			<div class="aa_description"><strong>即将完成</strong> - 设置xplusplus.cn账号，实现和xplusplus.cn的同步！</div>
+		</div>
+	</form>
+</div>
+<?php
+} else if($type == connect2xpp_admin::NOTICE_SET_KEY_SUS){
 ?>
 <div class="wrap alert active">
 <h3 class="key-status">设置xplusplus.cn的api key成功!</h3>
@@ -43,6 +137,24 @@ if($type == connect2xpp_admin::NOTICE_SET_KEY_SUS){
 	<p class="description">
 		错误码：<?php echo $code;?><BR>
 		错误信息:<?php echo $msg;?>
+	</p>
+</div>
+<?php }else if($type == connect2xpp_admin::NOTICE_XPP_GET_USER_NON){?>
+<div class="wrap alert critical">
+<h3 class="key-status failed">api key异常！</h3>
+	<p class="description">
+		请确认是否在xplusplus.cn更新过api key！
+	</p>
+</div>
+<?php }else if($type == connect2xpp_admin::NOTICE_XPP_GET_USER_SWICH_OFF){?>
+<div class="wrap alert critical">
+<h3 class="key-status failed">请在xplusplus.cn端打开开关！</h3>
+</div>
+<?php }else if($type == connect2xpp_admin::NOTICE_XPP_CODE_USED){?>
+<div class="wrap alert critical">
+<h3 class="key-status failed">该api key已经被使用！</h3>
+	<p class="description">
+		请在xplusplus.cn刷新api key或者在使用该api key的wordpress中停止使用该api key！
 	</p>
 </div>
 <?php }?>

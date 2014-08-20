@@ -340,20 +340,9 @@ h2.ak-header {
 	text-align: center;
 }
 
-.akismet-settings th.strictness {
-	vertical-align: top;
-	padding-top: 15px;
-}
-
-.akismet-settings input[type=text] {
-	width: 75%;
-}
-
-.akismet-settings span.note{
-	float: left;
-	padding-left: 23px;
-	font-size: 75%;
-	margin-top: -10px;
+.setting-item{
+	padding-top:5px;
+	padding-bottom: 5px;
 }
 
 .clearfix {

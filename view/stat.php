@@ -16,36 +16,34 @@
 						<h3 class="hndle"><span>账户信息</span></h3>
 						<form name="akismet_conf" id="akismet-conf" action="<?php echo esc_url( connect2xpp_admin::get_page_url() ); ?>" method="POST">
 							<div class="inside">
-								<table cellspacing="0" class="akismet-settings">
+								<table cellspacing="0">
 									<tbody>
 										<tr>
-											<th width="10%" align="left" scope="row">API KEY</th>
+											<th width="10%" align="right" scope="row">API KEY</th>
 											<td width="5%"/>
-											<td align="left">
-												<span class="api-key"><?php echo connect2xpp::get_api_key() ?></span>
+											<td align="left" class="setting-item">
+												<?php echo connect2xpp::get_api_key(); ?>
 											</td>
 										</tr>
 										<tr>
-											<th align="left" scope="row">用户名</th>
+											<th align="right" scope="row">用户名</th>
 											<td></td>
-											<td align="left">
-												<p>
-													<?php echo connect2xpp::getUserName();?>
-												</p>
+											<td align="left" class="setting-item">
+												<?php echo connect2xpp::getUserName();?>
 											</td>
 										</tr>
 										<tr>
-											<th class="strictness" align="left" scope="row">邮箱</th>
+											<th align="right" scope="row">邮箱</th>
 											<td></td>
-											<td align="left">
-												<p><?php echo connect2xpp::getEmail(); ?></p>
+											<td align="left" class="setting-item">
+												<?php echo connect2xpp::getEmail(); ?>
 											</td>
 										</tr>
 										<tr>
-											<th class="strictness" align="left" scope="row">地址</th>
+											<th align="right" scope="row">地址</th>
 											<td></td>
-											<td align="left">
-												<p><a href="<?php echo connect2xpp::getHome();?>"><?php echo connect2xpp::getHome();?></a></p>
+											<td align="left" class="setting-item">
+												<a href="<?php echo connect2xpp::getHome();?>"><?php echo connect2xpp::getHome();?></a>
 											</td>
 										</tr>
 									</tbody>

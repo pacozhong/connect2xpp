@@ -1,15 +1,15 @@
 <?php
 /**
- * @package Hello_Xpp
- * @version 1.6
+ * @package connect2xpp
+ * @version 1.0
  */
 /*
-Plugin Name: Hello Xpp
+Plugin Name: connect2xpp
 Plugin URI: http://localhost/xplusplus_web/index.php/index
 Description: www.xplusplus.cn的插件
 Author: 钟志勇
-Version: 1.6
-Author URI: http://ma.tt/
+Version: 1.0
+Author URI: http://localhost/xplusplus_web/index.php/index
 */
 
 if ( !function_exists( 'add_action' ) ) {

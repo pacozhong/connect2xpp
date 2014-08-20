@@ -19,6 +19,11 @@ class connect2xpp_admin{
 	const NOTICE_XPP_MAIL_STATUS_BAD = 'xpp_mail_status_bad';//xpp端邮箱状态不对
 	const NOTICE_XPP_OTHER_ERROR	=	'xpp_other_error';//xpp端其他错误
 	const NOTICE_SET_KEY_SUS	=	'set_key_sus';
+	const NOTICE_XPP_GET_USER_NON = 'xpp_get_user_non';//检查用户时，用户不存在
+	const NOTICE_XPP_GET_USER_SWICH_OFF = 'xpp_get_user_switch_off';//检查用户时，开关未打开
+	const NOTICE_XPP_CODE_USED	=	'xpp_code_used';//api key 已经使用
+	
+	const NOTICE_XPP_PLUGIN = 'xpp_plugin';
 	
 	public static function setReturnCodeAndMsg($code, $msg){
 		self::$return_code = $code;
@@ -29,9 +34,8 @@ class connect2xpp_admin{
 		if(! self::$initiated) {
 			self::init_hooks();
 		}
-		
 		if(isset($_POST['action'])){
-			if( $_POST['action'] == 'enter_key'){
+			if( $_POST['action'] == 'enter-key'){
 				self::save_key();
 			}else if($_POST['action'] == 'sync_all'){
 				self::sync_all();
@@ -40,10 +44,7 @@ class connect2xpp_admin{
 		if ( isset( $_GET['action'] ) ) {
 			if ( $_GET['action'] == 'delete-key' ) {
 				if ( isset( $_GET['_wpnonce'] ) && wp_verify_nonce( $_GET['_wpnonce'], self::NONCE ) ){
-					delete_option( connect2xpp::$xpp_api_key );
-					delete_option(connect2xpp::$xpp_email);
-					delete_option(connect2xpp::$xpp_home);
-					delete_option(connect2xpp::$xpp_user_name);
+					self::delete_key();
 				}
 			}
 		}
@@ -76,6 +77,10 @@ class connect2xpp_admin{
 		add_action( 'admin_menu', array('connect2xpp_admin', 'plugin_menu'));
 		
 		add_action( 'admin_enqueue_scripts', array( 'connect2xpp_admin', 'load_resources' ) );
+		
+		add_action( 'admin_notices', array( 'connect2xpp_admin', 'display_notice' ) );
+		
+		add_filter( 'plugin_action_links_'.plugin_basename( plugin_dir_path( __FILE__ ) . 'connect2xpp.php'), array( 'connect2xpp_admin', 'admin_plugin_settings_link' ) );
 	}
 	
 	public static function sync_all(){
@@ -85,7 +90,6 @@ class connect2xpp_admin{
 	public static function save_key(){
 		if ( function_exists('current_user_can') && !current_user_can('manage_options') )
 			die('cheating!');
-		
 		if ( !wp_verify_nonce( $_POST['_wpnonce'], self::NONCE ) )
 			return false;
 		$new_key = trim($_POST['key']);
@@ -107,6 +111,14 @@ class connect2xpp_admin{
 							$verify_ret_data['email'], $verify_ret_data['home']);
 		self::$notice = self::NOTICE_SET_KEY_SUS;
 		return true;
+	}
+	
+	public static function delete_key(){
+		connect2xpp::delete_key();
+		delete_option( connect2xpp::$xpp_api_key );
+		delete_option(connect2xpp::$xpp_email);
+		delete_option(connect2xpp::$xpp_home);
+		delete_option(connect2xpp::$xpp_user_name);
 	}
 	
 	public static function get_page_url( $page = 'form' ) {
@@ -150,6 +162,23 @@ class connect2xpp_admin{
 		}
 	}
 	
+	public static function display_notice() {
+		global $hook_suffix;
+		if ( $hook_suffix == 'plugins.php' && ! connect2xpp::get_api_key()) {
+			self::display_api_key_warning();
+		}
+	}
+	
+	public static function display_api_key_warning() {
+		connect2xpp::view( 'notice', array( 'type' => 'xpp_plugin' ) );
+	}
+	
+	public static function admin_plugin_settings_link( $links ) {
+		$settings_link = '<a href="'.self::get_page_url().'">设置</a>';
+		array_unshift( $links, $settings_link );
+		return $links;
+	}
+	
 	public static function plugin_menu() {
 		add_options_page( self::ADMIN_PAGE_TITLE, self::ADMIN_PAGE_TAB_NAME, 'manage_options', self::ADMIN_PAGE_NAME, array('connect2xpp_admin', 'plugin_options') );
 	}
@@ -170,6 +199,9 @@ class connect2xpp_admin{
 	}
 	
 	public static function display_stat(){
+		if(self::$notice == ''){
+			connect2xpp::check_user_info();
+		}
 		connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
 		connect2xpp::view('stat');
 	}

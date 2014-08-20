@@ -15,7 +15,7 @@
 		<p>如果您知道您的API密钥。</p>
 	</div>
 	<form action="<?php echo esc_url( connect2xpp_admin::get_page_url() ); ?>" method="post" id="connect2xpp-enter-api-key" class="right">
-		<input id="key" name="key" type="text" size="15" maxlength="12" value="" class="regular-text code">
+		<input id="key" name="key" type="text" size="15" value="" class="regular-text code">
 		<input type="hidden" name="action" value="enter-key">
 		<?php wp_nonce_field( connect2xpp_admin::NONCE ); ?>
 		<input type="submit" name="submit" id="submit" class="button button-secondary" value="使用此密钥">

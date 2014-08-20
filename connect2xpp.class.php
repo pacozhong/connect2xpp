@@ -8,6 +8,7 @@ class connect2xpp {
 	const XPLUSPLUS_API_URL = 'http://localhost/xplusplus_web/index.php/wp/';
 	const XPLUSPLUS_API_VERIFY = 'verify';
 	const XPLUSPLUS_API_GETUSERINFO = 'get_user_info';
+	const XPLUSPLUS_API_DELETE_KEY = 'delete_key';
 	
 	public static function init(){
 		
@@ -36,7 +37,31 @@ class connect2xpp {
 	}
 	
 	public static function save_api_key($key){
-		update_option( self::$xpp_api_key, key );
+		update_option( self::$xpp_api_key, $key );
+	}
+	
+	public static function check_user_info(){
+		$key = self::get_api_key();
+		if(! $key ){
+			return false;
+		}
+		$user_data = self::http_post(array('key' => $key), self::XPLUSPLUS_API_GETUSERINFO);
+		if(false === $user_data){
+			connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_HTTP_REQ_ERROR;
+			return false;
+		}
+		if($user_data['code'] != 1600){
+			connect2xpp_admin::setReturnCodeAndMsg($user_data['code'], $user_data['msg']);
+			if($user_data['code'] == 1601 || count($user_data['data']) == 0){
+				connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_GET_USER_NON;
+			}else connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_OTHER_ERROR;
+			return false;
+		}
+		if($user_data['data']['wp_switch'] != 2){
+			connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_GET_USER_SWICH_OFF;
+		}
+		self::setUserNameAndEmailAndHome($user_data['data']['first_name'] . $user_data['data']['second_name'], $user_data['data']['email'], $user_data['data']['home']);
+		return true;
 	}
 	
 	public static function verify_key($key){
@@ -53,11 +78,26 @@ class connect2xpp {
 				connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_SWITCH_OFF;
 			else if($ret_data['code'] == 1607)
 				connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_MAIL_STATUS_BAD;
-			else connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_OTHER_ERROR;
+			else if($ret_data['code'] == 1608){
+				connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_CODE_USED;
+			}else connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_OTHER_ERROR;
 			return false;
 		}
 		return $ret_data['data'];
-		
+	}
+	
+	public static function delete_key(){
+		$key = self::get_api_key();
+		$ret_data = self::http_post(array('key' => $key), self::XPLUSPLUS_API_DELETE_KEY);
+		if(false === $ret_data){
+			connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_HTTP_REQ_ERROR;
+			return false;
+		}
+		if($ret_data['code'] != 1600){
+			connect2xpp_admin::$notice = connect2xpp_admin::NOTICE_XPP_OTHER_ERROR;
+			return false;
+		}
+		return true;
 	}
 	
 	
@@ -78,13 +118,54 @@ class connect2xpp {
 	 */
 	public static function plugin_activation() {
 		if ( version_compare( $GLOBALS['wp_version'], CONNECT2XPP__MINIMUM_WP_VERSION, '<' ) ) {
-			load_plugin_textdomain( 'akismet' );
 				
-			$message = '<strong>'.sprintf(esc_html__( 'Akismet %s requires WordPress %s or higher.' , 'akismet'), AKISMET_VERSION, AKISMET__MINIMUM_WP_VERSION ).'</strong> '.sprintf(__('Please <a href="%1$s">upgrade WordPress</a> to a current version, or <a href="%2$s">downgrade to version 2.4 of the Akismet plugin</a>.', 'akismet'), 'https://codex.wordpress.org/Upgrading_WordPress', 'http://wordpress.org/extend/plugins/akismet/download/');
+			$message = '<strong>'.sprintf( 'connect2xpp %s requires WordPress %s or higher.' , 'akismet', AKISMET_VERSION, AKISMET__MINIMUM_WP_VERSION ).'</strong> '.sprintf('Please <a href="%1$s">upgrade WordPress</a> to a current version, or <a href="%2$s">downgrade to version 2.4 of the Akismet plugin</a>.', 'akismet', 'https://codex.wordpress.org/Upgrading_WordPress', 'http://wordpress.org/extend/plugins/akismet/download/');
 	
-			Akismet::bail_on_activation( $message );
+			connect2xpp::bail_on_activation( $message );
 		}
 	}
+	
+	private static function bail_on_activation( $message, $deactivate = true ) {
+		?>
+	<!doctype html>
+	<html>
+	<head>
+	<meta charset="<?php bloginfo( 'charset' ); ?>">
+	<style>
+	* {
+		text-align: center;
+		margin: 0;
+		padding: 0;
+		font-family: "Lucida Grande",Verdana,Arial,"Bitstream Vera Sans",sans-serif;
+	}
+	p {
+		margin-top: 1em;
+		font-size: 18px;
+	}
+	</style>
+	<body>
+	<p><?php echo  $message ; ?></p>
+	</body>
+	</html>
+	<?php
+			if ( $deactivate ) {
+				$plugins = get_option( 'active_plugins' );
+				$connect2xpp = plugin_basename(CONNECT2XPP__PLUGIN_DIR . 'connect2xpp.php' );
+				$update  = false;
+				foreach ( $plugins as $i => $plugin ) {
+					if ( $plugin === $connect2xpp ) {
+						$plugins[$i] = false;
+						$update = true;
+					}
+				}
+	
+				if ( $update ) {
+					update_option( 'active_plugins', array_filter( $plugins ) );
+				}
+			}
+			exit;
+		}
+	
 	
 	/**
 	 * Removes all connection options
@@ -119,12 +200,14 @@ class connect2xpp {
 	
 		$connect2xpp_url = self::XPLUSPLUS_API_URL . $interface;
 		$response = wp_remote_post( $connect2xpp_url, $http_args );
-		self::log( var_export(compact( '$connect2xpp_url', 'http_args', 'response' ), true ) );
+		self::log('url:' . $connect2xpp_url );
+		self::log('req:' . var_export($http_args, true));
+		self::log('reponse:' . var_export($response, true));
 		if ( is_wp_error( $response ) ){
 			self::log('http response is WPError');
 			return false;
 		}
-		if($response['headers']['code'] != 200){
+		if($response['response']['code'] != 200){
 			self::log('http response code is not 200');
 			return false;
 		}
@@ -132,7 +215,7 @@ class connect2xpp {
 			self::log('http response body empty');
 			return false;
 		}
-		$retData = json_decode($response['body']);
+		$retData = json_decode($response['body'], true);
 		if(false == $retData){
 			self::log('http reponse body decode error');
 			return false;
