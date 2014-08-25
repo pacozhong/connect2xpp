@@ -1,17 +1,32 @@
 <?php
 class connect2xpp {
-	public static $xpp_api_key = 'XPP_API_KEY';
-	public static $xpp_user_name = 'XPP_USER_NAME';
-	public static $xpp_email = 'XPP_EMAIL';
-	public static $xpp_home = 'XPP_HOME';
+	public static $xpp_api_key		=	'XPP_API_KEY';
+	public static $xpp_user_name	=	'XPP_USER_NAME';
+	public static $xpp_email		=	'XPP_EMAIL';
+	public static $xpp_home			=	'XPP_HOME';
 	
-	const XPLUSPLUS_API_URL = 'http://localhost/xplusplus_web/index.php/wp/';
-	const XPLUSPLUS_API_VERIFY = 'verify';
-	const XPLUSPLUS_API_GETUSERINFO = 'get_user_info';
-	const XPLUSPLUS_API_DELETE_KEY = 'delete_key';
+	public static $xpp_error		=	'XPP_ERROR';
+	
+	const XPLUSPLUS_API_URL			=	'http://localhost/xplusplus_web/index.php/wp/';
+	const XPLUSPLUS_API_VERIFY		=	'verify';
+	const XPLUSPLUS_API_GETUSERINFO	=	'get_user_info';
+	const XPLUSPLUS_API_DELETE_KEY	=	'delete_key';
+	const XPLUSPLUS_API_PUBLISH_POST	=	'publish_post';
+	const XPLUSPLUS_API_DELETE_POST	=	'delete_post';
+	const XPLUSPLUS_API_TRASH_POST	=	'trash_post';
+	const XPLUSPLUS_API_UNTRASH_POST	=	'untrash_post';
+	const XPLUSPLUS_API_UPDATE_POST	=	'update_post';
+	
 	
 	public static function init(){
 		
+	}
+	
+	public static function getXppError(){
+		return get_option(self::$xpp_error);
+	}
+	public static function setXppError($errorInfo){
+		update_option( self::$xpp_error, $errorInfo );
 	}
 	
 	public static function setUserNameAndEmailAndHome($user_name, $email, $home){
@@ -38,6 +53,109 @@ class connect2xpp {
 	
 	public static function save_api_key($key){
 		update_option( self::$xpp_api_key, $key );
+	}
+	
+	
+	
+	public static function publish_post($id, $post){
+		//get tags
+		$tags = array();
+		$tag_arr = wp_get_post_tags($id);
+		if(! empty($tag_arr)){
+			foreach ($tag_arr as $tag){
+				$tags [] = $tag->name;
+			}
+		}
+		$error_info = self::getXppError();
+		$ret_data = self::http_post(array('id' => $id,
+				'title' => $post->post_title, 'content' => $post->post_content,
+				'add_timestamp' => $post->post_date, 'tags' => implode(',', $tags)
+		), self::XPLUSPLUS_API_PUBLISH_POST);
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$id]){
+				unset($error_info[$id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}
+		if(false === $ret_data){
+			$error_info [$id] = '-1';
+		}else if($ret_data['code'] != 1600){
+			$error_info [$id] = $ret_data['code'];
+		}
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	public static function trash_post($id){
+		$error_info = self::getXppError();
+		$ret_data = self::http_post(array('id' => $id), self::XPLUSPLUS_API_TRASH_POST);
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$id]){
+				unset($error_info[$id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}
+		if(false === $ret_data){
+			$error_info [$id] = '-1';
+		}else if($ret_data['code'] != 1600){
+			$error_info [$id] = $ret_data['code'];
+		}
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	public static function untrash_post($id){
+		$error_info = self::getXppError();
+		$ret_data = self::http_post(array('id' => $id), self::XPLUSPLUS_API_UNTRASH_POST);
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$id]){
+				unset($error_info[$id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}
+		if(false === $ret_data){
+			$error_info [$id] = '-1';
+		}else if($ret_data['code'] != 1600){
+			$error_info [$id] = $ret_data['code'];
+		}
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	public static function delete_post($id){
+		$error_info = self::getXppError();
+		$ret_data = self::http_post(array('id' => $id), self::XPLUSPLUS_API_DELETE_POST);
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$id]){
+				unset($error_info[$id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}
+		if(false === $ret_data){
+			$error_info [$id] = '-1';
+		}else if($ret_data['code'] != 1600){
+			$error_info [$id] = $ret_data['code'];
+		}
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	public static function update_post($id, $post){
+		echo 'test add tags';
+		$tags = var_export(wp_get_post_tags($id), true);
+		self::log('tags info:' . $tags);
+	}
+	
+	public static function add_tags(){
+		
+	}
+	
+	public static function delete_tags(){
+		
 	}
 	
 	public static function check_user_info(){

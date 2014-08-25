@@ -66,13 +66,25 @@ class connect2xpp_admin{
 		 * trashed_post
 		 * Runs just after a post or page is trashed. Action function arguments: post or page ID.
 		 */
-		add_action( 'trashed_post', array('connect2xpp_admin', 'trashed_post'), 10, 1);
+		add_action( 'trashed_post', array('connect2xpp_admin', 'trash_post'), 10, 1);
 		
 		/**
 		 * untrashed_post
 		 * Runs just after undeletion, when a post or page is restored. Action function arguments: post or page ID.
 		 */
-		add_action( 'untrashed_post', array('connect2xpp_admin', 'untrashed_post'), 10, 1);
+		add_action( 'untrashed_post', array('connect2xpp_admin', 'untrash_post'), 10, 1);
+		
+		/**
+		 * Runs just after a post or page is deleted. Action function arguments: post or page ID.
+		 */
+		add_action( 'deleted_post', array('connect2xpp_admin', 'delete_post'), 10, 1);
+
+		/**
+		 * Runs after a post or page is updated. 
+		 * Action function arguments: post or page ID, WP_Post object of the post before the 
+		 * update and after the update.
+		 */
+		add_action('post_updated ', array('connect2xpp_admin', 'update_post'), 10, 2);
 		
 		add_action( 'admin_menu', array('connect2xpp_admin', 'plugin_menu'));
 		
@@ -206,33 +218,24 @@ class connect2xpp_admin{
 		connect2xpp::view('stat');
 	}
 	
-	/**
-	 * @param unknown $ID
-	 * @param unknown $post
-	 *
-	 * 1.检查用户，验证
-	 * 2.检查用户是否有这篇文章
-	 * 2.1.如果没有，新增文章
-	 * 2.2.如果有，更新文章
-	 *
-	 */
-	function publish_post($ID, $post){
-		$data = array('id' => $ID,
-				'title' => $post->post_title,
-				'content' => $post->post_content,
-				'add_timestamp' => $post->post_date);
-	
-		$url = 	'http://localhost/xplusplus_web/index.php/tool/test_wp';
-	
-		$ret = wp_safe_remote_post($url, array('body' => json_encode($data)));
-		file_put_contents('D:\\log.txt', var_export($ret, true), FILE_APPEND);
+	function publish_post($id, $post){
+		return connect2xpp::publish_post($id, $post);
 	}
 	
-	function trashed_post($ID){
-	
+	function trashed_post($id){
+		return connect2xpp::trash_post($id);
 	}
 	
-	function untrashed_post($ID){
-	
+	function untrashed_post($id){
+		return connect2xpp::untrash_post($id);
 	}
+	
+	function delete_post($id) {
+		return connect2xpp::delete_post($id);
+	}
+
+	function update_post($id, $post){
+		return connect2xpp::update_post($id, $post);
+	}
+	
 }
