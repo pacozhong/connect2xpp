@@ -79,13 +79,6 @@ class connect2xpp_admin{
 		 */
 		add_action( 'deleted_post', array('connect2xpp_admin', 'delete_post'), 10, 1);
 
-		/**
-		 * Runs after a post or page is updated. 
-		 * Action function arguments: post or page ID, WP_Post object of the post before the 
-		 * update and after the update.
-		 */
-		add_action('post_updated ', array('connect2xpp_admin', 'update_post'), 10, 2);
-		
 		add_action( 'admin_menu', array('connect2xpp_admin', 'plugin_menu'));
 		
 		add_action( 'admin_enqueue_scripts', array( 'connect2xpp_admin', 'load_resources' ) );
@@ -219,23 +212,23 @@ class connect2xpp_admin{
 	}
 	
 	function publish_post($id, $post){
+		if(! connect2xpp::get_api_key()) return false;
 		return connect2xpp::publish_post($id, $post);
 	}
 	
-	function trashed_post($id){
+	function trash_post($id){
+		if(! connect2xpp::get_api_key()) return false;
 		return connect2xpp::trash_post($id);
 	}
 	
-	function untrashed_post($id){
+	function untrash_post($id){
+		if(! connect2xpp::get_api_key()) return false;
 		return connect2xpp::untrash_post($id);
 	}
 	
 	function delete_post($id) {
+		if(! connect2xpp::get_api_key()) return false;
 		return connect2xpp::delete_post($id);
 	}
 
-	function update_post($id, $post){
-		return connect2xpp::update_post($id, $post);
-	}
-	
 }

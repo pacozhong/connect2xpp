@@ -144,20 +144,6 @@ class connect2xpp {
 		return false;
 	}
 	
-	public static function update_post($id, $post){
-		echo 'test add tags';
-		$tags = var_export(wp_get_post_tags($id), true);
-		self::log('tags info:' . $tags);
-	}
-	
-	public static function add_tags(){
-		
-	}
-	
-	public static function delete_tags(){
-		
-	}
-	
 	public static function check_user_info(){
 		$key = self::get_api_key();
 		if(! $key ){
