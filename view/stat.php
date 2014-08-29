@@ -62,6 +62,62 @@
 					</div>
 				</div>
 			</div>
+			<?php 
+				$error_info = connect2xpp::getXppError();
+				$sync_error_info = connect2xpp::getLastSyncError();
+				if((is_array($error_info) && !empty($error_info)) || (is_array($sync_error_info) && ! empty($sync_error_info))){
+			?>
+			<div class="postbox-container" style="width:30%;">
+				<div id="normal-sortables" class="meta-box-sortables ui-sortable">
+					<div id="referrers" class="postbox ">
+						<div class="handlediv" title="Click to toggle"><br></div>
+						<h3 class="hndle"><span>错误信息(<?php echo count($error_info);?>)</span></h3>
+						<div class="inside">
+							<table cellspacing="0">
+								<tbody>
+									<tr>
+										<th scope="row" align="left" scope="row">文章id</th>
+										<td width="5%"/>
+										<td align="left" class="setting-item">
+											(错误码)错误信息
+										</td>
+									</tr>
+									
+									<?php 
+									if(is_array($error_info) && !empty($error_info)){
+									foreach ($error_info as $id => $data) {?>
+									<tr>
+										<th scope="row" align="left"><?php echo $id;?></th>
+										<td width="5%"/>
+										<td align="left">
+											(<?php echo $data['code']; ?>)<?php echo $data['msg'];?>
+										</td>
+									</tr>
+									<?php }
+									}
+										if(is_array($sync_error_info) && ! empty($sync_error_info)){
+									?>
+									<tr>
+										<th scope="row" align="left">同步相关错误</th>
+										<td width="5%"/>
+										<td align="left">
+											<?php 
+											foreach ($sync_error_info as $id => $msg){
+												echo $msg . '<BR>';
+											}
+											?>
+										</td>
+									</tr>
+									<?php }?>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			<?php 
+				}
+			?>
 		</div>
 	</div>
 </div>

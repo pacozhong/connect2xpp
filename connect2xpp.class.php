@@ -7,6 +7,10 @@ class connect2xpp {
 	
 	public static $xpp_error		=	'XPP_ERROR';
 	
+	public static $xpp_last_sync_error	=	'XPP_LAST_SYNC_ERROR';
+	
+	public static $_status_arr	=	array(1 => 'publish', 2 => 'trash');
+	
 	const XPLUSPLUS_API_URL			=	'http://localhost/xplusplus_web/index.php/wp/';
 	const XPLUSPLUS_API_VERIFY		=	'verify';
 	const XPLUSPLUS_API_GETUSERINFO	=	'get_user_info';
@@ -15,11 +19,36 @@ class connect2xpp {
 	const XPLUSPLUS_API_DELETE_POST	=	'delete_post';
 	const XPLUSPLUS_API_TRASH_POST	=	'trash_post';
 	const XPLUSPLUS_API_UNTRASH_POST	=	'untrash_post';
-	const XPLUSPLUS_API_UPDATE_POST	=	'update_post';
+	const XPLUSPLUS_API_GET_ALL_POST	=	'all_post_list';
+	const XPLUSPLUS_API_SYNC_A_POST	=	'sync_post';
 	
+	
+	
+	private static $initiated = false;
 	
 	public static function init(){
+		if ( ! self::$initiated ) {
+			self::init_hooks();
+		}
+	}
+	
+	/**
+	 * Initializes WordPress hooks
+	 */
+	private static function init_hooks() {
+		self::$initiated = true;
+	
+		add_action( 'connect2xpp_sync', array( 'connect2xpp', 'sync' ) );
 		
+		if ( function_exists('wp_next_scheduled') && function_exists('wp_schedule_event') ) {
+			// WP 2.1+: delete old comments daily
+			if ( !wp_next_scheduled( 'connect2xpp_sync' ) )
+				wp_schedule_event( time(), 'hourly', 'connect2xpp_sync' );
+		}
+		elseif ( (mt_rand(1, 10) == 3) ) {
+			// WP 2.0: run this one time in ten
+			self::sync();
+		}
 	}
 	
 	public static function getXppError(){
@@ -27,6 +56,14 @@ class connect2xpp {
 	}
 	public static function setXppError($errorInfo){
 		update_option( self::$xpp_error, $errorInfo );
+	}
+	
+	public static function getLastSyncError(){
+		return get_option(self::$xpp_last_sync_error);
+	}
+	
+	public static function setLastSyncError($error){
+		update_option(self::$xpp_last_sync_error, $error);
 	}
 	
 	public static function setUserNameAndEmailAndHome($user_name, $email, $home){
@@ -56,20 +93,113 @@ class connect2xpp {
 	}
 	
 	
+	public static function sync(){
+		if(! self::get_api_key()) return false;
+		$post_to_sync = self::get_all_post_to_sync();
+		$last_sync_error = self::getLastSyncError();
+		if(null === $post_to_sync) {
+			$last_sync_error[1] = 'post to sync is null';
+			self::setLastSyncError($last_sync_error);
+			return false;
+		}
+		unset($last_sync_error[1]);
+		self::setLastSyncError($last_sync_error);
+		$post_sync = self::get_all_sync_post();
+		if(false === $post_sync) return false;
+		self::log('post to sync:' . var_export($post_to_sync, true));
+		self::log('post sync:' . var_export($post_sync, true));
+		$new_post_sync = array();
+		foreach ($post_sync as $post) {
+			$new_post_sync[$post['wp_id']] = $post;
+		}
+		foreach ($post_to_sync as $wp_post){
+			if($new_post_sync[$wp_post->ID]){
+				//check if need update
+				if($wp_post->post_modified > $new_post_sync[$wp_post->ID]['mod_timestamp']){
+					//update
+					self::sync_a_post($wp_post->ID);
+				}
+			}else {
+				//add post to xplusplus
+				self::sync_a_post($wp_post->ID);
+			}
+			unset($new_post_sync[$wp_post->ID]);
+		}
+		//delete post not exist in wordpress
+		foreach ($new_post_sync as $post_id => $post_info){
+			self::delete_post_sync($post_id);
+		}
+	}
 	
-	public static function publish_post($id, $post){
-		//get tags
+	
+	
+	private static function get_all_post_to_sync(){
+		global $wpdb;
+		return $wpdb->get_results($wpdb->prepare("SELECT ID, post_status, post_modified FROM {$wpdb->posts} WHERE post_type='post' AND post_status IN ('publish', 'trash') "));
+	}
+	
+	private static function sync_a_post($post_id){
+		$post_obj = WP_Post::get_instance($post_id);
+		$last_sync_error = self::getLastSyncError();
+		if(null === $post_obj) {
+			$last_sync_error[2] = 'can not get a instance from post id:' . $post_id;
+			self::setLastSyncError($last_sync_error);
+			return false;
+		}
+		unset($last_sync_error[2]);
+		self::setLastSyncError($last_sync_error);
+		
+		$request_data = array('id' => $post_id, 'title' => $post_obj->post_title, 'content' => $post_obj->post_content,
+				'add_timestamp' => $post_obj->post_modified, 'status' => $post_obj->post_status, 'tags' =>  implode(',', self::get_tags_arr($post_id))
+		);
+		$ret_data = self::http_post($request_data, self::XPLUSPLUS_API_SYNC_A_POST);
+		$error_info = self::getXppError();
+		if(false !== $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$post_id]){
+				unset($error_info[$post_id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}else if(false === $ret_data)
+			$error_info[$post_id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$post_id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
+		}
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	private static function get_all_sync_post(){
+		$error_info = self::getXppError();
+		$ret_data = self::http_post(array(), self::XPLUSPLUS_API_GET_ALL_POST);
+		$last_sync_error = self::getLastSyncError();
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			unset($last_sync_error[3]);
+			self::setLastSyncError($last_sync_error);
+			return $ret_data['data'];
+		}
+		
+		$last_sync_error[3] = 'requet to xpp error, interface:' . self::XPLUSPLUS_API_GET_ALL_POST;
+		self::setLastSyncError($last_sync_error);
+		return false;
+	}
+	
+	private static function get_tags_arr($post_id){
 		$tags = array();
-		$tag_arr = wp_get_post_tags($id);
+		$tag_arr = wp_get_post_tags($post_id);
 		if(! empty($tag_arr)){
 			foreach ($tag_arr as $tag){
 				$tags [] = $tag->name;
 			}
 		}
+		return $tags;
+	}
+	
+	public static function publish_post($id, $post){
 		$error_info = self::getXppError();
 		$ret_data = self::http_post(array('id' => $id,
 				'title' => $post->post_title, 'content' => $post->post_content,
-				'add_timestamp' => $post->post_date, 'tags' => implode(',', $tags)
+				'add_timestamp' => $post->post_date, 'tags' => implode(',', self::get_tags_arr($id))
 		), self::XPLUSPLUS_API_PUBLISH_POST);
 		if(false != $ret_data && $ret_data['code'] == 1600){
 			if($error_info[$id]){
@@ -77,11 +207,10 @@ class connect2xpp {
 				self::setXppError($error_info);
 			}
 			return true;
-		}
-		if(false === $ret_data){
-			$error_info [$id] = '-1';
-		}else if($ret_data['code'] != 1600){
-			$error_info [$id] = $ret_data['code'];
+		}else if(false === $ret_data)
+			$error_info[$id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
 		}
 		self::setXppError($error_info);
 		return false;
@@ -96,11 +225,10 @@ class connect2xpp {
 				self::setXppError($error_info);
 			}
 			return true;
-		}
-		if(false === $ret_data){
-			$error_info [$id] = '-1';
-		}else if($ret_data['code'] != 1600){
-			$error_info [$id] = $ret_data['code'];
+		}else if(false === $ret_data)
+			$error_info[$id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
 		}
 		self::setXppError($error_info);
 		return false;
@@ -115,11 +243,10 @@ class connect2xpp {
 				self::setXppError($error_info);
 			}
 			return true;
-		}
-		if(false === $ret_data){
-			$error_info [$id] = '-1';
-		}else if($ret_data['code'] != 1600){
-			$error_info [$id] = $ret_data['code'];
+		}else if(false === $ret_data)
+			$error_info[$id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
 		}
 		self::setXppError($error_info);
 		return false;
@@ -134,11 +261,28 @@ class connect2xpp {
 				self::setXppError($error_info);
 			}
 			return true;
+		}else if(false === $ret_data)
+			$error_info[$id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
 		}
-		if(false === $ret_data){
-			$error_info [$id] = '-1';
-		}else if($ret_data['code'] != 1600){
-			$error_info [$id] = $ret_data['code'];
+		self::setXppError($error_info);
+		return false;
+	}
+	
+	public static function delete_post_sync($id){
+		$ret_data = self::http_post(array('id' => $id), self::XPLUSPLUS_API_DELETE_POST);
+		$error_info = self::getXppError();
+		if(false != $ret_data && $ret_data['code'] == 1600){
+			if($error_info[$id]){
+				unset($error_info[$id]);
+				self::setXppError($error_info);
+			}
+			return true;
+		}else if(false === $ret_data)
+			$error_info[$id] = array('code' => -1 , 'msg'=> '其他错误');
+		else if($ret_data['code'] != 1600){
+			$error_info[$id] = array('code' => $ret_data['code'] , 'msg'=> $ret_data['msg']);
 		}
 		self::setXppError($error_info);
 		return false;
@@ -276,7 +420,20 @@ class connect2xpp {
 	 * @static
 	 */
 	public static function plugin_deactivation( ) {
-		//tidy up
+		//delete key
+		if(self::get_api_key())
+			self::delete_key();
+		//delete options
+		delete_option(self::$xpp_api_key);
+		delete_option(self::$xpp_email);
+		delete_option(self::$xpp_error);
+		delete_option(self::$xpp_home);
+		delete_option(self::$xpp_last_sync_error);
+		delete_option(self::$xpp_user_name);
+		
+		//delete cron
+		wp_clear_scheduled_hook('connect2xpp_sync');
+		
 	}
 	
 	

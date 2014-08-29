@@ -114,10 +114,6 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 <?php }else if($type == connect2xpp_admin::NOTICE_HTTP_REQ_ERROR){?>
 <div class="wrap alert critical">
 <h3 class="key-status failed">请求xplusplus.cn失败！</h3>
-	<p class="description">
-		错误码：<?php echo $code;?><BR>
-		错误信息:<?php echo $msg;?>
-	</p>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_CODE_NON){?>
 <div class="wrap alert critical">
