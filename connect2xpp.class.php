@@ -11,7 +11,8 @@ class connect2xpp {
 	
 	public static $_status_arr	=	array(1 => 'publish', 2 => 'trash');
 	
-	const XPLUSPLUS_API_URL			=	'http://localhost/xplusplus_web/index.php/wp/';
+	//const XPLUSPLUS_API_URL			=	'http://localhost/xplusplus_web/index.php/wp/';
+	const XPLUSPLUS_API_URL			=	'http://www.xplusplus.cn/wp/';
 	const XPLUSPLUS_API_VERIFY		=	'verify';
 	const XPLUSPLUS_API_GETUSERINFO	=	'get_user_info';
 	const XPLUSPLUS_API_DELETE_KEY	=	'delete_key';
