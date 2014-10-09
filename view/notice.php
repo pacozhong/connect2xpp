@@ -87,13 +87,13 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 </style>
 	<form name="xplusplus_activate" action="<?php echo esc_url( connect2xpp_admin::get_page_url() ); ?>" method="POST">
 		<div class="xplusplus_activate">
-			<div class="aa_a">X</div>
+			<div class="aa_a">x</div>
 			<div class="aa_button_container" onclick="document.xplusplus_activate.submit();">
 				<div class="aa_button_border">
-					<div class="aa_button">设置您的Xplusplus.cn账号</div>
+					<div class="aa_button">设置connect2xpp</div>
 				</div>
 			</div>
-			<div class="aa_description"><strong>即将完成</strong> - 设置xplusplus.cn账号，实现和xplusplus.cn的同步！</div>
+			<div class="aa_description">设置API KEY，实现和xplusplus.cn的同步！</div>
 		</div>
 	</form>
 </div>
@@ -101,15 +101,15 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 } else if($type == connect2xpp_admin::NOTICE_SET_KEY_SUS){
 ?>
 <div class="wrap alert active">
-<h3 class="key-status">设置xplusplus.cn的api key成功!</h3>
+<h3 class="key-status">设置API KEY成功!</h3>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_NEW_KEY_EMPTY){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">api key为空！</h3>
+<h3 class="key-status failed">API KEY为空！</h3>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_NEW_KEY_EQUAL_OLD_KEY){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">输入的api key和已有的相同！</h3>
+<h3 class="key-status failed">输入的API KEY和已有的相同！</h3>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_HTTP_REQ_ERROR){?>
 <div class="wrap alert critical">
@@ -117,11 +117,11 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_CODE_NON){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">api key错误！</h3>
+<h3 class="key-status failed">API KEY错误！</h3>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_MAIL_STATUS_BAD){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">邮箱未激活！</h3>
+<h3 class="key-status failed">xplusplus.cn注册邮箱未激活！</h3>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_SWITCH_OFF){?>
 <div class="wrap alert critical">
@@ -137,9 +137,9 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_GET_USER_NON){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">api key异常！</h3>
+<h3 class="key-status failed">API KEY异常！</h3>
 	<p class="description">
-		请确认是否在xplusplus.cn更新过api key！
+		请确认是否在xplusplus.cn更新过API KEY！
 	</p>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_GET_USER_SWICH_OFF){?>
@@ -148,9 +148,9 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 </div>
 <?php }else if($type == connect2xpp_admin::NOTICE_XPP_CODE_USED){?>
 <div class="wrap alert critical">
-<h3 class="key-status failed">该api key已经被使用！</h3>
+<h3 class="key-status failed">该API KEY已被使用！</h3>
 	<p class="description">
-		请在xplusplus.cn刷新api key或者在使用该api key的wordpress中停止使用该api key！
+		请在xplusplus.cn刷新API KEY，或者在使用该API KEY的独立博客中点击“断开此用户”，停止使用该API KEY！
 	</p>
 </div>
 <?php }?>

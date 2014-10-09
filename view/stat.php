@@ -1,20 +1,11 @@
 <div class="wrap">
-	<h2>connect to xpp</h2>
+	<h2>connect2xpp</h2>
 	<div class="have-key">
 		<div id="wpcom-stats-meta-box-container" class="metabox-holder">
-			<script type="text/javascript">
-			jQuery(document).ready( function($) {
-				jQuery('.if-js-closed').removeClass('if-js-closed').addClass('closed');
-				if(typeof postboxes !== 'undefined')
-					postboxes.add_postbox_toggles( 'plugins_page_akismet-key-config' );
-			});
-			</script>
 			<div class="postbox-container" style="width: 55%;margin-right: 10px;">
 				<div id="normal-sortables" class="meta-box-sortables ui-sortable">
 					<div id="referrers" class="postbox ">
-						<div class="handlediv" title="Click to toggle"><br></div>
-						<h3 class="hndle"><span>账户信息</span></h3>
-						<form name="akismet_conf" id="akismet-conf" action="<?php echo esc_url( connect2xpp_admin::get_page_url() ); ?>" method="POST">
+						<h3 class="hndle"><span>xplusplus.cn账户信息</span></h3>
 							<div class="inside">
 								<table cellspacing="0">
 									<tbody>
@@ -40,7 +31,7 @@
 											</td>
 										</tr>
 										<tr>
-											<th align="right" scope="row">地址</th>
+											<th align="right" scope="row">独立博客地址</th>
 											<td></td>
 											<td align="left" class="setting-item">
 												<a href="<?php echo connect2xpp::getHome();?>"><?php echo connect2xpp::getHome();?></a>
@@ -58,7 +49,6 @@
 								</div>
 								<div class="clear"></div>
 							</div>
-						</form>
 					</div>
 				</div>
 			</div>
@@ -70,7 +60,6 @@
 			<div class="postbox-container" style="width:30%;">
 				<div id="normal-sortables" class="meta-box-sortables ui-sortable">
 					<div id="referrers" class="postbox ">
-						<div class="handlediv" title="Click to toggle"><br></div>
 						<h3 class="hndle"><span>错误信息(<?php echo count($error_info);?>)</span></h3>
 						<div class="inside">
 							<table cellspacing="0">
@@ -98,7 +87,7 @@
 										if(is_array($sync_error_info) && ! empty($sync_error_info)){
 									?>
 									<tr>
-										<th scope="row" align="left">同步相关错误</th>
+										<th scope="row" align="left">同步错误</th>
 										<td width="5%"/>
 										<td align="left">
 											<?php 

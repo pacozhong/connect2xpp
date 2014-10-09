@@ -142,28 +142,10 @@ class connect2xpp_admin{
 		global $hook_suffix;
 	
 		if ( in_array( $hook_suffix, array(
-				//'index.php', # dashboard
-				//'edit-comments.php',
-				//'comment.php',
-				//'post.php',
 				'settings_page_' . self::ADMIN_PAGE_NAME,
-				//'jetpack_page_akismet-key-config',
 		) ) ) {
 			wp_register_style( 'connect2xpp.css', CONNECT2XPP__PLUGIN_URL . '_inc/connect2xpp.css', array(), CONNECT2XPP_VERSION );
 			wp_enqueue_style( 'connect2xpp.css');
-	
-			wp_register_script( 'akismet.js', CONNECT2XPP__PLUGIN_URL . '_inc/connect2xpp.js', array('jquery','postbox'), CONNECT2XPP_VERSION );
-			wp_enqueue_script( 'akismet.js' );
-			/*wp_localize_script( 'akismet.js', 'WPAkismet', array(
-			'comment_author_url_nonce' => wp_create_nonce( 'comment_author_url_nonce' ),
-			'strings' => array(
-			'Remove this URL' => __( 'Remove this URL' , 'akismet'),
-			'Removing...'     => __( 'Removing...' , 'akismet'),
-			'URL removed'     => __( 'URL removed' , 'akismet'),
-			'(undo)'          => __( '(undo)' , 'akismet'),
-			'Re-adding...'    => __( 'Re-adding...' , 'akismet'),
-			)
-			) );*/
 		}
 	}
 	
@@ -199,7 +181,7 @@ class connect2xpp_admin{
 	public static function display_form(){
 		if(self::$notice == '')
 			echo '<h2 class="ak-header">xplusplus.cn</h2>';
-		connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
+		else connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
 		connect2xpp::view('form');
 	}
 	

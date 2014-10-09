@@ -5,11 +5,12 @@
  */
 /*
 Plugin Name: connect2xpp
-Plugin URI: http://localhost/xplusplus_web/index.php/index
-Description: www.xplusplus.cn的插件
+Plugin URI: http://www.xplusplus.cn/connect2xpp
+Description: connect2xpp可以把独立技术博客聚合到<a href="http://www.xplusplus.cn/">xplusplus.cn</a>。xplusplus.cn是IT技术精英的知识分享社区，聚合了<a href="http://www.xplusplus.cn/connect2xpp#top-user">众多技术大牛的独立博客</a>。
 Author: 钟志勇
 Version: 1.0
-Author URI: http://localhost/xplusplus_web/index.php/index
+Author URI: http://www.xplusplus.cn/connect2xpp#author
+Text Domain: connect2xpp
 */
 
 if ( !function_exists( 'add_action' ) ) {
@@ -18,10 +19,8 @@ if ( !function_exists( 'add_action' ) ) {
 }
 
 define( 'CONNECT2XPP_VERSION', '1.0.0' );
-//define( 'CONNECT2XPP__MINIMUM_WP_VERSION', '3.0' );
 define( 'CONNECT2XPP__PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'CONNECT2XPP__PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
-//define( 'CONNECT2XPP_DELETE_LIMIT', 100000 );
 
 register_activation_hook( __FILE__, array( 'connect2xpp', 'plugin_activation' ) );
 register_deactivation_hook( __FILE__, array( 'connect2xpp', 'plugin_deactivation' ) );

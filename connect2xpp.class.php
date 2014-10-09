@@ -11,7 +11,6 @@ class connect2xpp {
 	
 	public static $_status_arr	=	array(1 => 'publish', 2 => 'trash');
 	
-	//const XPLUSPLUS_API_URL			=	'http://localhost/xplusplus_web/index.php/wp/';
 	const XPLUSPLUS_API_URL			=	'http://www.xplusplus.cn/wp/';
 	const XPLUSPLUS_API_VERIFY		=	'verify';
 	const XPLUSPLUS_API_GETUSERINFO	=	'get_user_info';
@@ -42,12 +41,10 @@ class connect2xpp {
 		add_action( 'connect2xpp_sync', array( 'connect2xpp', 'sync' ) );
 		
 		if ( function_exists('wp_next_scheduled') && function_exists('wp_schedule_event') ) {
-			// WP 2.1+: delete old comments daily
 			if ( !wp_next_scheduled( 'connect2xpp_sync' ) )
 				wp_schedule_event( time(), 'hourly', 'connect2xpp_sync' );
 		}
 		elseif ( (mt_rand(1, 10) == 3) ) {
-			// WP 2.0: run this one time in ten
 			self::sync();
 		}
 	}
@@ -366,12 +363,7 @@ class connect2xpp {
 	 * @static
 	 */
 	public static function plugin_activation() {
-		if ( version_compare( $GLOBALS['wp_version'], CONNECT2XPP__MINIMUM_WP_VERSION, '<' ) ) {
-				
-			$message = '<strong>'.sprintf( 'connect2xpp %s requires WordPress %s or higher.' , 'akismet', AKISMET_VERSION, AKISMET__MINIMUM_WP_VERSION ).'</strong> '.sprintf('Please <a href="%1$s">upgrade WordPress</a> to a current version, or <a href="%2$s">downgrade to version 2.4 of the Akismet plugin</a>.', 'akismet', 'https://codex.wordpress.org/Upgrading_WordPress', 'http://wordpress.org/extend/plugins/akismet/download/');
-	
-			connect2xpp::bail_on_activation( $message );
-		}
+		
 	}
 	
 	private static function bail_on_activation( $message, $deactivate = true ) {
