@@ -6,8 +6,10 @@
 * 博客1
 * 博客2
 * 博客3
+
 ###2.聚合xplusplus.cn之后，通过搜索引擎[xppgo!](http://www.xplusplus.cn/search)可以快速搜索到你的文章。
 [xppgo!](http://www.xplusplus.cn/search)是专门为IT技术人员打造的搜索引擎。和通用的搜索引擎不同，[xppgo!](http://www.xplusplus.cn/search)的搜索结果只会出现优质的独立博客技术文章，不会是一个文章的多个复制粘贴。
+
 ##如何使用connect2xpp接入[xplusplus.cn](http://www.xplusplus.cn)
 
 ###1.获取API KEY
