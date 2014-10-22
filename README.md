@@ -1,11 +1,6 @@
 ##connect2xpp是一个wordpress插件
 
 ###1.把独立技术博客聚合到[xplusplus.cn](http://www.xplusplus.cn)，与众多独立技术博客大牛进行线上社交。
-正在使用connect2xpp的独立技术博客：
-
-* 博客1
-* 博客2
-* 博客3
 
 ###2.聚合xplusplus.cn之后，通过搜索引擎[xppgo!](http://www.xplusplus.cn/search)可以快速搜索到你的文章。
 
@@ -38,3 +33,17 @@
 ![设置API KEY 1](http://www.xplusplus.cn/asset/img/connect2xpp_setting_3.jpg)
 
 设置成功！以后wordpress博客中的文章会自动同步到xplusplus.cn，并在[xppgo!](http://www.xplusplus.cn/search)中搜索到。
+
+* * *
+
+相关链接：
+
+*	[有哪些技术大牛加入了xplusplus.cn?](http://www.xplusplus.cn/doc/daniu)
+*	[xplusplus.cn简介](http://www.xplusplus.cn/doc/about)
+*	[wordpress插件connect2xpp](http://www.xplusplus.cn/doc/connect2xpp)
+*	[如何使用connect2xpp插件把独立博客聚合到xplusplus.cn?](http://www.xplusplus.cn/doc/connect2xpp#how)
+*	[搜索引擎xppgo!](http://www.xplusplus.cn/doc/xppgo)
+*	[如何在xplusplus.cn中发布文章?](http://www.xplusplus.cn/doc/how)
+*	[Markdown语法指南](http://www.xplusplus.cn/doc/markdown)
+ 
+

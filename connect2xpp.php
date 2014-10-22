@@ -5,11 +5,11 @@
  */
 /*
 Plugin Name: connect2xpp
-Plugin URI: http://www.xplusplus.cn/connect2xpp
+Plugin URI: http://www.xplusplus.cn/doc/connect2xpp
 Description: connect2xpp可以把独立技术博客聚合到<a href="http://www.xplusplus.cn/">xplusplus.cn</a>。xplusplus.cn是IT技术精英的知识分享社区，聚合了<a href="http://www.xplusplus.cn/connect2xpp#top-user">众多技术大牛的独立博客</a>。
 Author: 钟志勇
 Version: 1.0
-Author URI: http://www.xplusplus.cn/connect2xpp#author
+Author URI: http://www.xplusplus.cn/doc/connect2xpp
 Text Domain: connect2xpp
 */
 
