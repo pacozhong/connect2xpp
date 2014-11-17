@@ -147,7 +147,13 @@ class connect2xpp {
 		unset($last_sync_error[2]);
 		self::setLastSyncError($last_sync_error);
 		
-		$request_data = array('id' => $post_id, 'title' => $post_obj->post_title, 'content' => $post_obj->post_content,
+		$post_content = $post_obj->post_content;
+		$post_title = $post_obj->post_title;
+		$post_content = apply_filters('the_content', $post_content);
+		$post_title = apply_filters('the_title', $post_title);
+		
+		
+		$request_data = array('id' => $post_id, 'title' => $post_title, 'content' => $post_content,
 				'add_timestamp' => $post_obj->post_modified, 'status' => $post_obj->post_status, 'tags' =>  implode(',', self::get_tags_arr($post_id))
 		);
 		$ret_data = self::http_post($request_data, self::XPLUSPLUS_API_SYNC_A_POST);
