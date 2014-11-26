@@ -180,7 +180,7 @@ class connect2xpp_admin{
 	
 	public static function display_form(){
 		if(self::$notice == '')
-			echo '<h2 class="ak-header">xplusplus.cn</h2>';
+			echo '<h2 class="c2p-header">connect2xpp</h2>';
 		else connect2xpp::view('notice', array('type' => self::$notice, 'code' => self::$return_code, 'msg' => self::$return_msg));
 		connect2xpp::view('form');
 	}

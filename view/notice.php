@@ -93,7 +93,7 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 					<div class="aa_button">设置connect2xpp</div>
 				</div>
 			</div>
-			<div class="aa_description">设置API KEY，实现和xplusplus.cn的同步！</div>
+			<div class="aa_description">设置API KEY，和xplusplus.cn同步，把技术文章分享给更多的IT技术爱好者！</div>
 		</div>
 	</form>
 </div>
