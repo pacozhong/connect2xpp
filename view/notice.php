@@ -9,12 +9,18 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 	<style type="text/css">
 .xplusplus_activate{
 	min-width:825px;
-	border:1px solid #4F800D;
+	border:1px solid #111111;
 	padding:5px;
 	margin:15px 0;
-	background:#83AF24;
-	background-image:-webkit-gradient(linear,0% 0,80% 100%,from(#83AF24),to(#4F800D));
-	background-image:-moz-linear-gradient(80% 100% 120deg,#4F800D,#83AF24);
+	background:#317ef3;
+	background: -webkit-gradient(linear,left bottom,right top,color-stop(0%,#317ef3),color-stop(100%,#111111));
+	background: -o-linear-gradient(45deg, #317ef3 0, #111111 100%);
+    background: -ms-linear-gradient(45deg,#317ef3 0,#111111 100%);
+    background: linear-gradient(45deg,#317ef3 0,#111111 100%);
+    filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#317ef3', endColorstr='#111111', GradientType=1);
+    webkit-box-shadow: inset 0 3px 7px rgba(0,0,0,.2),inset 0 -3px 7px rgba(0,0,0,.2);
+    moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.2),inset 0 -3px 7px rgba(0,0,0,.2);
+    box-shadow: inset 0 3px 7px rgba(0,0,0,.2),inset 0 -3px 7px rgba(0,0,0,.2);
 	-moz-border-radius:3px;border-radius:3px;
 	-webkit-border-radius:3px;
 	position:relative;overflow:hidden
@@ -24,20 +30,19 @@ if ( $type == connect2xpp_admin::NOTICE_XPP_PLUGIN ) {?>
 	top:-5px;
 	right:10px;
 	font-size:140px;
-	color:#769F33;
+	color:#317ef3;
 	font-family:Georgia, "Times New Roman", Times, serif;z-index:1
 }
 .xplusplus_activate .aa_button{
 	font-weight:bold;
-	border:1px solid #029DD6;
-	border-top:1px solid #06B9FD;
+	border-top:1px solid #2d6ca2;
 	font-size:15px;
 	text-align:center;
 	padding:9px 0 8px 0;
 	color:#FFF;
-	background:#029DD6;
-	background-image:-webkit-gradient(linear,0% 0,0% 100%,from(#029DD6),to(#0079B1));
-	background-image:-moz-linear-gradient(0% 100% 90deg,#0079B1,#029DD6);
+	background:#428bca;
+	background-image:-webkit-gradient(linear,0% 0,0% 100%,from(#428bca),to(#2d6ca2));
+	background-image:-moz-linear-gradient(0% 100% 90deg,#428bca,#2d6ca2);
 	-moz-border-radius:2px;
 	border-radius:2px;
 	-webkit-border-radius:2px
